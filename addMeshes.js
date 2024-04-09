@@ -94,7 +94,7 @@ export function addSides(num) {
 	const side4 = new THREE.Mesh(geometry, material4)
 	side4.position.set(0, 0, -5)
 
-	sides = [side1, side2, side3, side4];
+	const sides = [side1, side2, side3, side4];
 
 	return sides[num];
 }

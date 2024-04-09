@@ -49,10 +49,10 @@ function init() {
 		//scene.add(meshes.background)
 		//scene.add(meshes.knot)
 		//scene.add(meshes.cap)
-	scene.add(side1)
-	scene.add(side2)
-	scene.add(side3)
-	scene.add(side4)
+	//scene.add(side1)
+	// scene.add(side2)
+	// scene.add(side3)
+	// scene.add(side4)
 	//rotateSides(side1, side2, side3, side4);
 
 
@@ -229,8 +229,8 @@ function animate() {
 	for (const mixer of mixers) {
 		mixer.update(delta)
 	}
-	if (meshes.flower) {
-		meshes.flower.rotation.y -= 0.01
+	if (meshes.longLeaves) {
+		meshes.longLeaves.rotation.y -= 0.04
 	}
 	// meshes.default.scale.x += 0.01
 
