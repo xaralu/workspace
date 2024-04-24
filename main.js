@@ -3,8 +3,7 @@ import * as THREE from 'three'
 import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap, addSides} from './addMeshes'
 import { addLight } from './addLights'
 import Model from './Model'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 const scene = new THREE.Scene()
 const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -23,7 +22,22 @@ camera.position.set(9, 9, 10)
 const meshes = {}
 const mixers = []
 const clock = new THREE.Clock()
-const controls = new OrbitControls(camera, renderer.domElement)
+
+const objects = [];
+//need to add the bed here as an object. for now i will call the computer the object
+
+
+let raycaster;
+
+let moveForward = false;
+let moveBackward = false;
+let moveLeft = false;
+let moveRight = false;
+let canJump = false;
+
+let prevTime = performance.now();
+const velocity = new THREE.Vector3();
+const direction = new THREE.Vector3();
 
 init()
 
@@ -43,30 +57,158 @@ function init() {
 	meshes.side4 = addSides(3);
 	meshes.side4 = addSides(4);
 	meshes.side4 = addSides(5);
-
-	//console.log(addSides(1));
-
+		let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
+		floorGeometry.rotateX( - Math.PI / 2 );
+		const floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+	scene.add( floor );
 
 	//lights
 	meshes.defaultLight = addLight()
+	scene.fog = new THREE.Fog(0x3d4035, 0, 100);
 
 	//scene operations
-		//scene.add(meshes.default)
-		//scene.add(meshes.standard)
 	scene.add(meshes.defaultLight)
-		//scene.add(meshes.background)
-		//scene.add(meshes.knot)
-		//scene.add(meshes.cap)
 	scene.add(meshes.side1)
 	scene.add(meshes.side2)
 	scene.add(meshes.side3)
 	scene.add(meshes.side4)
 	scene.add(meshes.side5)
 	scene.add(meshes.side5)
-	scene.fog = new THREE.Fog(0x3d4035, 0, 100);
-	//rotateSides(side1, side2, side3, side4);
+
+	let controls = new PointerLockControls(camera, document.body)
+
+	const blocker = document.getElementById( 'blocker' );
+	const instructions = document.getElementById( 'instructions' );
+
+	instructions.addEventListener( 'click', function () {
+		controls.lock();
+	} );
+
+	controls.addEventListener( 'lock', function () {
+		instructions.style.display = 'none';
+		blocker.style.display = 'none';
+	} );
+
+	controls.addEventListener( 'unlock', function () {
+		blocker.style.display = 'block';
+		instructions.style.display = '';
+	} );
+
+	scene.add( controls.getObject() );
+
+	const onKeyDown = function ( event ) {
+		switch ( event.code ) {
+
+			case 'ArrowUp':
+			case 'KeyW':
+				moveForward = true;
+				break;
+
+			case 'ArrowLeft':
+			case 'KeyA':
+				moveLeft = true;
+				break;
+
+			case 'ArrowDown':
+			case 'KeyS':
+				moveBackward = true;
+				break;
+
+			case 'ArrowRight':
+			case 'KeyD':
+				moveRight = true;
+				break;
+
+			case 'Space':
+				if ( canJump === true ) velocity.y += 350;
+				canJump = false;
+				break;
+		}
+		console.log("key pressed")
+	};
+
+	const onKeyUp = function ( event ) {
+		switch ( event.code ) {
+
+			case 'ArrowUp':
+			case 'KeyW':
+				moveForward = false;
+				break;
+
+			case 'ArrowLeft':
+			case 'KeyA':
+				moveLeft = false;
+				break;
+
+			case 'ArrowDown':
+			case 'KeyS':
+				moveBackward = false;
+				break;
+
+			case 'ArrowRight':
+			case 'KeyD':
+				moveRight = false;
+				break;
+		}
+	};
+
+	document.addEventListener( 'keydown', onKeyDown );
+	document.addEventListener( 'keyup', onKeyUp );
+
+	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+
+	
+
+	const time = performance.now();
 
 
+	if ( controls.isLocked === true ) {
+
+		raycaster.ray.origin.copy( controls.getObject().position );
+		raycaster.ray.origin.y -= 10;
+
+		const intersections = raycaster.intersectObjects( objects, false );
+
+		const onObject = intersections.length > 0;
+
+		const delta = ( time - prevTime ) / 1000;
+
+		velocity.x -= velocity.x * 10.0 * delta;
+		velocity.z -= velocity.z * 10.0 * delta;
+
+		velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+		direction.z = Number( moveForward ) - Number( moveBackward );
+		direction.x = Number( moveRight ) - Number( moveLeft );
+		direction.normalize(); // this ensures consistent movements in all directions
+
+		if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
+		if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+
+		if ( onObject === true ) {
+
+			velocity.y = Math.max( 0, velocity.y );
+			canJump = true;
+
+		}
+
+		controls.moveRight( - velocity.x * delta );
+		controls.moveForward( - velocity.z * delta );
+
+		controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+
+		if ( controls.getObject().position.y < 10 ) {
+
+			velocity.y = 0;
+			controls.getObject().position.y = 10;
+
+			canJump = true;
+
+		}
+
+	}
+	prevTime = time;
 
 	models()
 	resize()
@@ -87,9 +229,8 @@ function models() {
 		//mixers: mixers,
 	})
 	Computer.init()
+	objects.push(Computer)
 }
-
-
 
 function resize() {
 	window.addEventListener('resize', () => {
