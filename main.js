@@ -1,6 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
-import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap, addSides} from './addMeshes'
+import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap} from './addMeshes'
 import { addLight } from './addLights'
 import Model from './Model'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -14,14 +14,16 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 )
-camera.position.set(10, 15, 10)
+camera.position.set(9, 9, 13)
 // let mesh
 const meshes = {}
 const mixers = []
 const clock = new THREE.Clock()
 const controls = new OrbitControls(camera, renderer.domElement)
 
+
 init()
+
 function init() {
 	renderer.setSize(window.innerWidth, window.innerHeight)
 	document.body.appendChild(renderer.domElement)
@@ -32,11 +34,14 @@ function init() {
 	meshes.background = addBackground()
 	meshes.knot = addGlassKnot()
 	meshes.cap = addMatCap()
-	meshes.side1 = addSides(1);
-	meshes.side2 = addSides(2);
-	meshes.side3 = addSides(3);
-	meshes.side4 = addSides(4);
-	console.log(addSides(1));
+	// meshes.side1 = addSides(0);
+	// meshes.side2 = addSides(1);
+	// meshes.side3 = addSides(2);
+	// meshes.side4 = addSides(3);
+	// meshes.side4 = addSides(4);
+	// meshes.side4 = addSides(5);
+
+	//console.log(addSides(1));
 
 
 	//lights
@@ -49,10 +54,13 @@ function init() {
 		//scene.add(meshes.background)
 		//scene.add(meshes.knot)
 		//scene.add(meshes.cap)
-	//scene.add(side1)
-	// scene.add(side2)
-	// scene.add(side3)
-	// scene.add(side4)
+	// scene.add(meshes.side1)
+	// scene.add(meshes.side2)
+	// scene.add(meshes.side3)
+	// scene.add(meshes.side4)
+	// scene.add(meshes.side5)
+	// scene.add(meshes.side5)
+	scene.fog = new THREE.Fog(0x3d4035, 0, 100);
 	//rotateSides(side1, side2, side3, side4);
 
 
@@ -62,148 +70,19 @@ function init() {
 }
 
 function models() {
-	const Bubbles = new Model({
-		name: 'bubbles',
-		url: '/bubbles.glb',
+	const Computer = new Model({
+		name: 'computer',
+		url: '/test.glb',
 		scene: scene,
 		meshes: meshes,
 		scale: new THREE.Vector3(1, 2.5, 1),
 		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/bubble3.jpg',
+		// replace: true,
+		// replaceURL: '/bubble3.jpg',
 		//animationState: true,
 		//mixers: mixers,
 	})
-	Bubbles.init()
-
-	const Stalk = new Model({
-		name: 'stalk',
-		url: '/stalk.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/green4.png',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	Stalk.init()
-
-	const Bulbs = new Model({
-		name: 'bulbs',
-		url: '/bulbs.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/pink.jpeg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	Bulbs.init()
-
-	const BottomPetals = new Model({
-		name: 'bottomPetal',
-		url: '/new-bottom-petals.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/planet.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	BottomPetals.init()
-
-	const TopPetals = new Model({
-		name: 'topPetal',
-		url: '/new-top-petals.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/planet.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	TopPetals.init()
-
-	const LongLeaves = new Model({
-		name: 'longLeaves',
-		url: '/long-leaves.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/boing.png',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	LongLeaves.init()
-
-	const Pollen = new Model({
-		name: 'pollen',
-		url: '/pollen.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/yellow.png',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	Pollen.init()
-
-	const TopThing = new Model({
-		name: 'topThing',
-		url: '/top-thing.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/pearl.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	TopThing.init()
-
-	const BottomLeaves = new Model({
-		name: 'BottomLeaves',
-		url: '/bottom-leaves.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/biiing.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	BottomLeaves.init()
-
-
-	const TopLeaves = new Model({
-		name: 'topLeaves',
-		url: '/top-leaves.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		replace: true,
-		replaceURL: '/bing.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	TopLeaves.init()
-
-
+	Computer.init()
 }
 
 
@@ -230,9 +109,10 @@ function animate() {
 		mixer.update(delta)
 	}
 	if (meshes.longLeaves) {
-		meshes.longLeaves.rotation.y -= 0.04
+		meshes.longLeaves.rotation.y -= 0.002
 	}
 	// meshes.default.scale.x += 0.01
 
 	renderer.render(scene, camera)
+	
 }
