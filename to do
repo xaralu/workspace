@@ -1,0 +1,8 @@
+to do
+
+- add plane that the camera can be positioned on.
+- make objects clickable with raycaster, manipulate outline of objects in response to click (not sure what tool to use to do this)
+- add popups with HTML
+- figure out how to layer html elements over the 3js stuff
+- loading screen
+- mobile/simplified version of website
