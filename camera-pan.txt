@@ -1,0 +1,9 @@
+how to set the camera position along a predefined plane?
+
+set intial camera position - think about how the viewer will be introduced to the scene
+looking out the window maybe?
+
+
+
+
+ask hwo to change arrow keys to be the input for panning

@@ -1,6 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
-import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap} from './addMeshes'
+import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap, addSides} from './addMeshes'
 import { addLight } from './addLights'
 import Model from './Model'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -14,13 +14,16 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 )
-camera.position.set(9, 9, 13)
+
+
+camera.position.set(9, 9, 10)
+
+
 // let mesh
 const meshes = {}
 const mixers = []
 const clock = new THREE.Clock()
 const controls = new OrbitControls(camera, renderer.domElement)
-
 
 init()
 
@@ -34,12 +37,12 @@ function init() {
 	meshes.background = addBackground()
 	meshes.knot = addGlassKnot()
 	meshes.cap = addMatCap()
-	// meshes.side1 = addSides(0);
-	// meshes.side2 = addSides(1);
-	// meshes.side3 = addSides(2);
-	// meshes.side4 = addSides(3);
-	// meshes.side4 = addSides(4);
-	// meshes.side4 = addSides(5);
+	meshes.side1 = addSides(0);
+	meshes.side2 = addSides(1);
+	meshes.side3 = addSides(2);
+	meshes.side4 = addSides(3);
+	meshes.side4 = addSides(4);
+	meshes.side4 = addSides(5);
 
 	//console.log(addSides(1));
 
@@ -54,14 +57,15 @@ function init() {
 		//scene.add(meshes.background)
 		//scene.add(meshes.knot)
 		//scene.add(meshes.cap)
-	// scene.add(meshes.side1)
-	// scene.add(meshes.side2)
-	// scene.add(meshes.side3)
-	// scene.add(meshes.side4)
-	// scene.add(meshes.side5)
-	// scene.add(meshes.side5)
+	scene.add(meshes.side1)
+	scene.add(meshes.side2)
+	scene.add(meshes.side3)
+	scene.add(meshes.side4)
+	scene.add(meshes.side5)
+	scene.add(meshes.side5)
 	scene.fog = new THREE.Fog(0x3d4035, 0, 100);
 	//rotateSides(side1, side2, side3, side4);
+
 
 
 	models()
@@ -75,7 +79,7 @@ function models() {
 		url: '/test.glb',
 		scene: scene,
 		meshes: meshes,
-		scale: new THREE.Vector3(1, 2.5, 1),
+		scale: new THREE.Vector3(1, 1, 1),
 		position: new THREE.Vector3(0, -0.8, 3),
 		// replace: true,
 		// replaceURL: '/bubble3.jpg',
@@ -112,6 +116,26 @@ function animate() {
 		meshes.longLeaves.rotation.y -= 0.002
 	}
 	// meshes.default.scale.x += 0.01
+
+
+	//LIMITING THE CAMERA POSITION: 
+	// if (camera.position.z !== 10) {
+	// 	camera.position.z = 10
+	// }
+
+	//if the y is too large or to small just move the postiion back
+	// if (camera.position.x > 10) {
+	// 	camera.position.x = 10
+	// } else if (camera.position.x < 0) {
+	// 	camera.position.x = 0
+	// }
+
+	// //if y is out of bounds, move it back
+	// if (camera.position.y > 5) {
+	// 	camera.position.y = 5
+	// } else if (camera.position.y < 0) {
+	// 	camera.position.y = 0
+	// }
 
 	renderer.render(scene, camera)
 	
