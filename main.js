@@ -4,30 +4,35 @@ import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMa
 import { addLight } from './addLights'
 import Model from './Model'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { postprocessing } from '../workspace-final/postprocessing'
 
+//Globals
 const scene = new THREE.Scene()
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 const camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
 	0.1,
-	100
+	1000
 )
-
-
-camera.position.set(9, 9, 10)
-
-
-// let mesh
-const meshes = {}
-const mixers = []
+const composer = postprocessing(scene, camera, renderer)
+const pointer = new THREE.Vector2()
+const raycaster = new THREE.Raycaster()
 const clock = new THREE.Clock()
+let controls
 
+
+
+//camera.position.y = -50;
+// camera.position.x = 5;
+// camera.position.z = -10;
+
+camera.position.set(0,0,0)
+const meshes = {}
 const objects = [];
 //need to add the bed here as an object. for now i will call the computer the object
+//are the errors with the moving because I havent pushed anything to this array?
 
-
-let raycaster;
 
 let moveForward = false;
 let moveBackward = false;
@@ -40,6 +45,7 @@ const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
 
 init()
+animate()
 
 function init() {
 	renderer.setSize(window.innerWidth, window.innerHeight)
@@ -55,8 +61,7 @@ function init() {
 	meshes.side2 = addSides(1);
 	meshes.side3 = addSides(2);
 	meshes.side4 = addSides(3);
-	meshes.side4 = addSides(4);
-	meshes.side4 = addSides(5);
+	meshes.side5 = addSides(4);
 		let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 		floorGeometry.rotateX( - Math.PI / 2 );
 		const floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
@@ -74,9 +79,8 @@ function init() {
 	scene.add(meshes.side3)
 	scene.add(meshes.side4)
 	scene.add(meshes.side5)
-	scene.add(meshes.side5)
 
-	let controls = new PointerLockControls(camera, document.body)
+	controls = new PointerLockControls(camera, document.body)
 
 	const blocker = document.getElementById( 'blocker' );
 	const instructions = document.getElementById( 'instructions' );
@@ -158,10 +162,58 @@ function init() {
 
 	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	//
+
+	window.addEventListener( 'resize', onWindowResize );
+
+
+	// scene.add( Computer )
+	// objects.push( Computer )
 	
+	models()
+}
 
+function models() {
+	const Computer = new Model({
+		name: 'computer',
+		url: './test.glb',
+		scene: scene,
+		meshes: meshes,
+		scale: new THREE.Vector3(1, 1, 1),
+		position: new THREE.Vector3(0, -0.8, 3),
+		// replace: true,
+		// replaceURL: '/bubble3.jpg',
+		//animationState: true,
+		//mixers: mixers,
+	})
+	Computer.init()
+}
+
+// function resize() {
+// 	window.addEventListener('resize', () => {
+// 		renderer.setSize(window.innerWidth, window.innerHeight)
+// 		camera.aspect = window.innerWidth / window.innerHeight
+// 		camera.updateProjectionMatrix()
+// 	})
+// }
+
+function onWindowResize() {
+
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+function animate() {
+
+	requestAnimationFrame(animate)
 	const time = performance.now();
-
 
 	if ( controls.isLocked === true ) {
 
@@ -185,12 +237,10 @@ function init() {
 
 		if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
 		if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-
+		console.log('his')
 		if ( onObject === true ) {
-
 			velocity.y = Math.max( 0, velocity.y );
 			canJump = true;
-
 		}
 
 		controls.moveRight( - velocity.x * delta );
@@ -207,42 +257,27 @@ function init() {
 
 		}
 
+
+		//modify position
+		if ( controls.getObject().position.z > 10 ) {
+			controls.getObject().position.z = 10;
+		}
+		if ( controls.getObject().position.z < -10 ) {
+			controls.getObject().position.z = -10;
+		}
+		if ( controls.getObject().position.x > 10 ) {
+			controls.getObject().position.x = 10;
+		}
+		if ( controls.getObject().position.x < -10 ) {
+			controls.getObject().position.x = -10;
+		}
+		
+
 	}
+	
 	prevTime = time;
 
-	models()
-	resize()
-	animate()
-}
-
-function models() {
-	const Computer = new Model({
-		name: 'computer',
-		url: '/test.glb',
-		scene: scene,
-		meshes: meshes,
-		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
-		// replace: true,
-		// replaceURL: '/bubble3.jpg',
-		//animationState: true,
-		//mixers: mixers,
-	})
-	Computer.init()
-	objects.push(Computer)
-}
-
-function resize() {
-	window.addEventListener('resize', () => {
-		renderer.setSize(window.innerWidth, window.innerHeight)
-		camera.aspect = window.innerWidth / window.innerHeight
-		camera.updateProjectionMatrix()
-	})
-}
-
-function animate() {
-	requestAnimationFrame(animate)
-	const delta = clock.getDelta()
+	//const delta = clock.getDelta()
 
 	meshes.default.rotation.x += 0.01
 	meshes.default.rotation.z += 0.01
@@ -250,34 +285,5 @@ function animate() {
 	meshes.standard.rotation.x += 0.01
 	meshes.standard.rotation.z += 0.01
 
-	for (const mixer of mixers) {
-		mixer.update(delta)
-	}
-	if (meshes.longLeaves) {
-		meshes.longLeaves.rotation.y -= 0.002
-	}
-	// meshes.default.scale.x += 0.01
-
-
-	//LIMITING THE CAMERA POSITION: 
-	// if (camera.position.z !== 10) {
-	// 	camera.position.z = 10
-	// }
-
-	//if the y is too large or to small just move the postiion back
-	// if (camera.position.x > 10) {
-	// 	camera.position.x = 10
-	// } else if (camera.position.x < 0) {
-	// 	camera.position.x = 0
-	// }
-
-	// //if y is out of bounds, move it back
-	// if (camera.position.y > 5) {
-	// 	camera.position.y = 5
-	// } else if (camera.position.y < 0) {
-	// 	camera.position.y = 0
-	// }
-
-	renderer.render(scene, camera)
-	
+	renderer.render(scene, camera)	
 }
