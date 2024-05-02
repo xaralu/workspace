@@ -38,7 +38,8 @@
       position: absolute;
     }
 
-    #computer-popup {
+    .popup {
+      display: none;
       color: black;
       background-color: aliceblue;
       position: absolute;
@@ -71,7 +72,10 @@
 
   <img id="crosshair" src="/crosshair.png" alt="crosshair" height="20" width="20"/>
 
-  <div id="computer-popup">
+  <div class="popup" id="placeholder"></div>
+
+  <div class="popup" id="computer">
+    <button type="button" class="exit">x</button>
     <p>
       -- Contact / Networking --
     </p>

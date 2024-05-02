@@ -41,6 +41,9 @@ let prevTime = performance.now();
 const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
 
+//not sure where this variable should be
+let active = 'placeholder';
+
 init()
 animate()
 
@@ -85,22 +88,10 @@ function init() {
 	const instructions = document.getElementById( 'instructions' );
 	const crosshair = document.getElementById( 'crosshair' );
 
-	//add this once the computer popup is fixed.
-	//const computerPopup = document.getElementById( 'computer-popup' );
-	// [name of computer object].addEventListener( 'click', function () {
-	// 	computerPopup.show()
-	// } );
-
-	// [name of computer object].addEventListener( 'show', function () {
-	// 		computerPopup.style.display = 'flex';
-	// } );
-	//need to add exit function
-
 	instructions.addEventListener( 'click', function () {
 		controls.lock();
 	} );
 
-	
 	controls.addEventListener( 'lock', function () {
 		instructions.style.display = 'none';
 		blocker.style.display = 'none';
@@ -224,6 +215,8 @@ function onPointerMove ( event ) {
 	checkIntersection();
 }
 
+
+
 function checkIntersection() {
 	raycaster.setFromCamera(pointer, camera)
 	const intersects = raycaster.intersectObjects(scene.children, true)
@@ -232,6 +225,16 @@ function checkIntersection() {
 		const selectedObject = intersects[ 0 ].object
 		addSelectedObject( selectedObject )
 		composer.outline.selectedObjects = selectedObjects
+		
+		if (active === 'computer' || active === 'placeholder') {
+			active = selectedObject.userData.groupName;
+			checkActive();
+		}
+		//if (selectedObject.userData.groupName === 'computer') {
+			
+			//assign active variable to this groupName
+			//have a separate function that aways displays whichever variable is active. 
+		//}
 	} else {
 
 		composer.outline.selectedObjects = [];
@@ -246,42 +249,23 @@ function addSelectedObject( object ) {
 
 }
 
-// function raycast() {
-// 	window.addEventListener('mousemove', (event) => {
-// 		pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-// 		pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
-		
-// 		raycaster.setFromCamera(pointer, camera)
-// 		const intersects = raycaster.intersectObjects(scene.children, true)
-		
-// 		for (let i = 0; i < intersects.length; i++) {
-// 			let object = intersects[i].object
-// 			while (object) {
-// 				console.log(object.userData)
-
-// 				if ( object.userData.groupName === 'computer' ) {
-// 					console.log("if statement entered")
-// 					//activate the corresponding popup
-// 					composer.outline.selectedObjects = [meshes.computer]
-// 					break
-// 				}
-			
-// 				object = object.parent
-// 			}
-			
-// 			composer.outline.selectedObjects = []
-
-// 		}
-
-		
-// 	})
-// }
-
 function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
+
+function checkActive() {
+	let activeEle = document.getElementById(active);
+	console.log("active is: " + active);
+	//active is undefined?
+	//oh i guess this isnt formatted right. 
+	
+	activeEle.addEventListener( 'click', function () {
+		activeEle.style.display = 'flex'
+	} );
+}
+//later on, I need to say: when exit button pressed, assign active to placeholder. 
 
 function animate() {
 
