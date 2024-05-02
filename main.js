@@ -225,16 +225,16 @@ function checkIntersection() {
 		const selectedObject = intersects[ 0 ].object
 		addSelectedObject( selectedObject )
 		composer.outline.selectedObjects = selectedObjects
-		
-		if (active === 'computer' || active === 'placeholder') {
+		console.log("check intersection active is: " + active)
+		console.log("active as a string is " + active.toString())
+		//dont know if this is working actually. how to tell thetype of 
+		//let strHopefully = active.toString();
+		//just tested this in node and hopefully it is like. okay. 
+		console.log()
+		if (selectedObject.userData.groupName === 'computer' || selectedObject.userData.groupName === 'placeholder') {
 			active = selectedObject.userData.groupName;
-			checkActive();
+			checkActive(active);
 		}
-		//if (selectedObject.userData.groupName === 'computer') {
-			
-			//assign active variable to this groupName
-			//have a separate function that aways displays whichever variable is active. 
-		//}
 	} else {
 
 		composer.outline.selectedObjects = [];
@@ -255,11 +255,13 @@ function onWindowResize() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
-function checkActive() {
-	let activeEle = document.getElementById(active);
+function checkActive(active) {
+
+	let activeEle = document.getElementById(active.toString());
 	console.log("active is: " + active);
 	//active is undefined?
 	//oh i guess this isnt formatted right. 
+	//click isnt working now. doesnt change from placeholder. 
 	
 	activeEle.addEventListener( 'click', function () {
 		activeEle.style.display = 'flex'
