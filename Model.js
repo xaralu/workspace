@@ -75,6 +75,8 @@ export default class Model {
 				this.rotation.y,
 				this.rotation.z
 			)
+			this.meshes[`${this.name}`].userData.groupName = this.name
+
 			this.scene.add(this.meshes[`${this.name}`])
 		})
 	}

@@ -1,10 +1,14 @@
 import './style.css'
 import * as THREE from 'three'
 import { addBoilerPlateMesh, addStandardMesh, addBackground, addGlassKnot, addMatCap, addSides} from './addMeshes'
+//import { addComputer } from "./addGlbs"
 import { addLight } from './addLights'
-import Model from './Model'
+//just made addlights instead of addLights
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-import { postprocessing } from '../workspace-final/postprocessing'
+import { postprocessing } from './postprocessing'
+import gsap from 'gsap'
+import Model from './Model'
+
 
 //Globals
 const scene = new THREE.Scene()
@@ -16,30 +20,23 @@ const camera = new THREE.PerspectiveCamera(
 	1000
 )
 const composer = postprocessing(scene, camera, renderer)
+composer.outline.selectedObjects = []
 const pointer = new THREE.Vector2()
-const raycaster = new THREE.Raycaster()
+let raycaster = new THREE.Raycaster()
 const clock = new THREE.Clock()
 let controls
-
-
-
-//camera.position.y = -50;
-// camera.position.x = 5;
-// camera.position.z = -10;
 
 camera.position.set(0,0,0)
 const meshes = {}
 const objects = [];
+let selectedObjects = []
+const mixers = []
 //need to add the bed here as an object. for now i will call the computer the object
-//are the errors with the moving because I havent pushed anything to this array?
-
-
 let moveForward = false;
 let moveBackward = false;
 let moveLeft = false;
 let moveRight = false;
 let canJump = false;
-
 let prevTime = performance.now();
 const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
@@ -67,6 +64,7 @@ function init() {
 		const floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 	scene.add( floor );
+	//meshes.computer = addComputer();
 
 	//lights
 	meshes.defaultLight = addLight()
@@ -79,24 +77,41 @@ function init() {
 	scene.add(meshes.side3)
 	scene.add(meshes.side4)
 	scene.add(meshes.side5)
+	//scene.add(meshes.computer)
 
 	controls = new PointerLockControls(camera, document.body)
 
 	const blocker = document.getElementById( 'blocker' );
 	const instructions = document.getElementById( 'instructions' );
+	const crosshair = document.getElementById( 'crosshair' );
+
+	//add this once the computer popup is fixed.
+	//const computerPopup = document.getElementById( 'computer-popup' );
+	// [name of computer object].addEventListener( 'click', function () {
+	// 	computerPopup.show()
+	// } );
+
+	// [name of computer object].addEventListener( 'show', function () {
+	// 		computerPopup.style.display = 'flex';
+	// } );
+	//need to add exit function
 
 	instructions.addEventListener( 'click', function () {
 		controls.lock();
 	} );
 
+	
 	controls.addEventListener( 'lock', function () {
 		instructions.style.display = 'none';
 		blocker.style.display = 'none';
+		crosshair.style.display = 'flex';
+
 	} );
 
 	controls.addEventListener( 'unlock', function () {
 		blocker.style.display = 'block';
 		instructions.style.display = '';
+		crosshair.style.display = 'none';
 	} );
 
 	scene.add( controls.getObject() );
@@ -172,10 +187,16 @@ function init() {
 
 
 	// scene.add( Computer )
-	// objects.push( Computer )
+	// objects.push(  )
 	
 	models()
+	// raycast()
+	window.addEventListener( 'pointermove', onPointerMove );
+
 }
+// objects.push(meshes.computer)
+console.log(objects)
+
 
 function models() {
 	const Computer = new Model({
@@ -184,30 +205,82 @@ function models() {
 		scene: scene,
 		meshes: meshes,
 		scale: new THREE.Vector3(1, 1, 1),
-		position: new THREE.Vector3(0, -0.8, 3),
+		position: new THREE.Vector3(0, 0, 0),
 		// replace: true,
 		// replaceURL: '/bubble3.jpg',
 		//animationState: true,
 		//mixers: mixers,
-	})
+		// computer.userData.groupName = 'target1'
+	}
+	)	
 	Computer.init()
 }
 
-// function resize() {
-// 	window.addEventListener('resize', () => {
-// 		renderer.setSize(window.innerWidth, window.innerHeight)
-// 		camera.aspect = window.innerWidth / window.innerHeight
-// 		camera.updateProjectionMatrix()
+function onPointerMove ( event ) {
+	//primary thing
+	pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+	pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+	checkIntersection();
+}
+
+function checkIntersection() {
+	raycaster.setFromCamera(pointer, camera)
+	const intersects = raycaster.intersectObjects(scene.children, true)
+	console.log(intersects)
+	if (intersects.length > 0) {
+		const selectedObject = intersects[ 0 ].object
+		addSelectedObject( selectedObject )
+		composer.outline.selectedObjects = selectedObjects
+	} else {
+
+		composer.outline.selectedObjects = [];
+
+	}
+}
+
+function addSelectedObject( object ) {
+
+	selectedObjects = [];
+	selectedObjects.push( object );
+
+}
+
+// function raycast() {
+// 	window.addEventListener('mousemove', (event) => {
+// 		pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+// 		pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+		
+// 		raycaster.setFromCamera(pointer, camera)
+// 		const intersects = raycaster.intersectObjects(scene.children, true)
+		
+// 		for (let i = 0; i < intersects.length; i++) {
+// 			let object = intersects[i].object
+// 			while (object) {
+// 				console.log(object.userData)
+
+// 				if ( object.userData.groupName === 'computer' ) {
+// 					console.log("if statement entered")
+// 					//activate the corresponding popup
+// 					composer.outline.selectedObjects = [meshes.computer]
+// 					break
+// 				}
+			
+// 				object = object.parent
+// 			}
+			
+// 			composer.outline.selectedObjects = []
+
+// 		}
+
+		
 // 	})
 // }
 
 function onWindowResize() {
-
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-
 	renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
 
 function animate() {
@@ -237,7 +310,6 @@ function animate() {
 
 		if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
 		if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-		console.log('his')
 		if ( onObject === true ) {
 			velocity.y = Math.max( 0, velocity.y );
 			canJump = true;
@@ -285,5 +357,6 @@ function animate() {
 	meshes.standard.rotation.x += 0.01
 	meshes.standard.rotation.z += 0.01
 
-	renderer.render(scene, camera)	
+	// renderer.render(scene, camera)	
+	composer.composer.render()
 }

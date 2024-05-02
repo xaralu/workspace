@@ -6,6 +6,7 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <link rel="stylesheet" type="text/css" href="xara-style.css" /> 
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  
   <title>Vite App</title>
   <style>
     #blocker {
@@ -13,6 +14,8 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0,0,0,0.5);
+      font-family: 'Courier New', Courier, monospace;
+      color: rgb(255, 59, 59);
     }
 
     #instructions {
@@ -27,6 +30,25 @@
       text-align: center;
       font-size: 14px;
       cursor: pointer;
+    }
+
+    #crosshair {
+      display: none;
+      margin-left: 50%;
+      position: absolute;
+    }
+
+    #computer-popup {
+      color: black;
+      background-color: aliceblue;
+      position: absolute;
+      width: 200px;
+      border: solid;
+      border-width: 3px;
+      border-color: red;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      margin-left: 40px;
     }
   </style>
   
@@ -46,7 +68,28 @@
       </p>
     </div>
   </div>
- 
+
+  <img id="crosshair" src="/crosshair.png" alt="crosshair" height="20" width="20"/>
+
+  <div id="computer-popup">
+    <p>
+      -- Contact / Networking --
+    </p>
+
+    <p>
+      xara alexander <br>
+      xaraluha@gmail.com <br>
+      ig: @xaraalexander <br>
+    </p>
+    <p>
+      please reach out! open to collaboration + would love 2 chat <br>
+    </p>
+    <p>
+      --------
+    </p>
+  </div>
+
+
   <script type="module" src="/main.js"></script>
 </body>
 
